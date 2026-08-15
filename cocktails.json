@@ -1,0 +1,61 @@
+[
+  {
+    "nome": "Mojito",
+    "ingredienti": [
+      {
+        "nome": "Rum Bianco",
+        "quantita": 50
+      },
+      {
+        "nome": "Succo di Lime",
+        "quantita": 30
+      },
+      {
+        "nome": "Menta",
+        "quantita": 6
+      },
+      {
+        "nome": "Zucchero di Canna",
+        "quantita": 2
+      },
+      {
+        "nome": "Soda",
+        "quantita": 60
+      }
+    ]
+  },
+  {
+    "nome": "Negroni",
+    "ingredienti": [
+      {
+        "nome": "Gin",
+        "quantita": 30
+      },
+      {
+        "nome": "Campari",
+        "quantita": 30
+      },
+      {
+        "nome": "Vermouth Rosso",
+        "quantita": 30
+      }
+    ]
+  },
+  {
+    "nome": "Margarita",
+    "ingredienti": [
+      {
+        "nome": "Tequila",
+        "quantita": 50
+      },
+      {
+        "nome": "Triple Sec",
+        "quantita": 20
+      },
+      {
+        "nome": "Succo di Lime",
+        "quantita": 15
+      }
+    ]
+  }
+]
