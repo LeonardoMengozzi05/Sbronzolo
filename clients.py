@@ -1,15 +1,22 @@
+from nicegui.observables import ObservableDict
 from datetime import datetime 
 import asyncio
 import threading
 
-timeout = 120
+timeout = 6
 
-class Client:
+class Client():
     def __init__(self, token, position):
         self.token = token
         self.event = asyncio.Event()
-        self.position = position
+        self._position = ObservableDict({'value': position})
         self.last_seen = datetime.now() 
+    @property
+    def position(self):
+        return self._position['value']
+    @position.setter
+    def position(self, value):
+        self._position['value'] = value
     def isLogged(self):
         return (datetime.now() - self.last_seen).seconds < timeout
     def update_activity(self):
@@ -36,22 +43,23 @@ class Clients:
         with self.lock:
             return next((c for c in self.clients if c.token == token), None)
 
+    def __remove(self, index=0):
+        c = self.clients.pop(index)
+        for position, client in enumerate(self.clients, index):
+            client.position = position
+        return c
+
     def removeSlogged(self):
-        def remove(index=0):
-            c = self.clients.pop(index)
-            for position, client in enumerate(self.clients, index):
-                client.position = position
-            return c
         with self.lock:
             if len(self.clients) > 0:
                 for i in range(len(self.clients) - 1, -1, -1):
                     if not self.clients[i].isLogged():
-                        c = remove(i)
+                        c = self.__remove(i)
                         if i == 0:
                             c.event.set()
 
     def logout(self):
         with self.lock:
-            c = self.clients.remove(0)
+            c = self.__remove()
             if c is not None:
                 c.event.set()

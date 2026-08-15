@@ -7,15 +7,13 @@ import uuid
 import asyncio
 import json
 
-# http://lm.local:8080
-
 clients = Clients()
 
 stop_event = threading.Event()
 def bouncer():
     while not stop_event.is_set():
         clients.removeSlogged()
-        stop_event.wait(30)
+        stop_event.wait(10)
 app.on_shutdown(lambda: stop_event.set())
 thread = threading.Thread(target=bouncer, daemon=True)
 thread.start()
@@ -25,7 +23,7 @@ def findUserOnServer():
 
 def richiede_client_valido(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs):
         client = findUserOnServer()
         if not client:
             app.storage.user.pop('token', None)
@@ -36,7 +34,7 @@ def richiede_client_valido(func):
             ui.notify("Stai saltando la fila furbetto.", type='warning')
             ui.navigate.to('/')
             return
-        ui.timer(10.0, lambda: client.update_activity)
+        return await func(*args, **kwargs)
     return wrapper
 
 @ui.page('/')
@@ -48,11 +46,15 @@ async def start():
             token = str(uuid.uuid4())
             app.storage.user['token'] = token
         client = clients.add(token)
-    ui.timer(10.0, lambda: client.update_activity())
+    ui.timer(2.0, client.update_activity)
     if clients.isFirst(client):
         ui.navigate.to('/cocktail')
         return
-    ui.label().bind_text_from(client, 'position', backward=lambda position: f'Posizione: {position}')
+    ui.label().bind_text_from(
+        client, 
+        'position', 
+        backward=lambda position: f'Posizione: {position}'
+    )
     async def wait_for_turn():
         await client.event.wait()
         ui.navigate.to('/cocktail')
@@ -75,7 +77,7 @@ async def cocktail():
 async def shaking():
     c = app.storage.user.get('cocktail')
     if c is not None:
-        ui.label(f"Sbronzolo sta preparando il tuo {c['nome']}")
+        ui.label(f"Sbronzolo sta preparando il tuo {c}")
         spinner = ui.spinner()
         spinner.visible = True
 
@@ -88,7 +90,7 @@ async def shaking():
         #stdout, stderr = await process.communicate()
         #risultato = stdout.decode().strip()
 
-        await asyncio.sleep(15)
+        #await asyncio.sleep(15)
 
         spinner.visible = False
         ui.navigate.to('/readyToDrink')
@@ -98,7 +100,7 @@ async def shaking():
 
 @ui.page('/readyToDrink')
 @richiede_client_valido
-def readyToDrink():
+async def readyToDrink():
     ui.label('FINE')
     clients.logout()
     app.storage.user.pop('token', None)
