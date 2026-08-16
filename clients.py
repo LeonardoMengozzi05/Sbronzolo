@@ -54,17 +54,20 @@ class Clients:
             logClient(client, f"Nuova posizione: {position}")
         return c
 
+    def __startNext(self):
+        if len(self.clients) > 0:
+            self.clients[0].event.set()
+
     def removeSlogged(self):
         with self.lock:
             if len(self.clients) > 0:
                 for i in range(len(self.clients) - 1, -1, -1):
                     if not self.clients[i].isLogged():
-                        c = self.__remove("rimosso per intattività", i)
+                        self.__remove("rimosso per intattività", i)
                         if i == 0:
-                            c.event.set()
+                            self.__startNext()
 
     def logout(self):
         with self.lock:
-            c = self.__remove("si è sloggato")
-            if c is not None:
-                c.event.set()
+            self.__remove("si è sloggato")
+            self.__startNext()

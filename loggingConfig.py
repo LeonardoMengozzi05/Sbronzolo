@@ -26,7 +26,3 @@ formatter = logging.Formatter(
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
-console = logging.StreamHandler()
-console.setFormatter(formatter)
-logger.addHandler(console)
