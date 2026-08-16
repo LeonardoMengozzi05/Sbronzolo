@@ -1,5 +1,6 @@
 from nicegui.observables import ObservableDict
 from datetime import datetime 
+from loggingConfig import logClient
 import asyncio
 import threading
 
@@ -20,6 +21,7 @@ class Client():
     def isLogged(self):
         return (datetime.now() - self.last_seen).seconds < timeout
     def update_activity(self):
+        logClient(self, "sono ancora connesso")
         self.last_seen = datetime.now()
 
 class Clients:
@@ -31,6 +33,7 @@ class Clients:
         c = Client(token, len(self.clients))
         with self.lock:
             self.clients.append(c)
+            logClient(c, "aggiunto in coda")
         return c
 
     def isFirst(self, client):
@@ -43,10 +46,12 @@ class Clients:
         with self.lock:
             return next((c for c in self.clients if c.token == token), None)
 
-    def __remove(self, index=0):
+    def __remove(self, msg, index=0):
         c = self.clients.pop(index)
+        logClient(c, msg)
         for position, client in enumerate(self.clients, index):
             client.position = position
+            logClient(client, f"Nuova posizione: {position}")
         return c
 
     def removeSlogged(self):
@@ -54,12 +59,12 @@ class Clients:
             if len(self.clients) > 0:
                 for i in range(len(self.clients) - 1, -1, -1):
                     if not self.clients[i].isLogged():
-                        c = self.__remove(i)
+                        c = self.__remove("rimosso per intattività", i)
                         if i == 0:
                             c.event.set()
 
     def logout(self):
         with self.lock:
-            c = self.__remove()
+            c = self.__remove("si è sloggato")
             if c is not None:
                 c.event.set()

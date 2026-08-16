@@ -1,9 +1,10 @@
 from clients import Clients
-import threading
+from pathlib import Path
 from datetime import datetime
 from functools import wraps
 from nicegui import app, ui
 import uuid
+import threading
 import asyncio
 import json
 
@@ -12,9 +13,9 @@ clients = Clients()
 stop_event = threading.Event()
 def bouncer():
     while not stop_event.is_set():
-        clients.removeSlogged()
+        #clients.removeSlogged()
         stop_event.wait(10)
-app.on_shutdown(lambda: stop_event.set())
+app.on_shutdown(stop_event.set)
 thread = threading.Thread(target=bouncer, daemon=True)
 thread.start()
 
@@ -101,8 +102,15 @@ async def shaking():
 @ui.page('/readyToDrink')
 @richiede_client_valido
 async def readyToDrink():
-    ui.label('FINE')
-    clients.logout()
-    app.storage.user.pop('token', None)
+    ui.label('Il tuo cocktail è pronto. Ritiralo e premi il seguente bottone.')
+    def ritirato():
+        clients.logout()
+        app.storage.user.pop('token', None)
+        ui.navigate.to('/goodDrink')
+    ui.button('Ritirato', on_click=ritirato)
+
+@ui.page('/goodDrink')
+async def goodDrink():
+   ui.image(Path('img/sbronzolo.jpeg')).classes('w-64')
 
 ui.run(host='0.0.0.0', port=8080, storage_secret='stronzo')
