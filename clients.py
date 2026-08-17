@@ -47,12 +47,11 @@ class Clients:
             return next((c for c in self.clients if c.token == token), None)
 
     def __remove(self, msg, index=0):
-        c = self.clients.pop(index)
-        logClient(c, msg)
-        for position, client in enumerate(self.clients, index):
-            client.position = position
-            logClient(client, f"update position to {position}")
-        return c
+        if len(self.clients) > 0:
+            logClient(self.clients.pop(index), msg)
+            for position, client in enumerate(self.clients, index):
+                client.position = position
+                logClient(client, f"update position to {position}")
 
     def __startNext(self):
         if len(self.clients) > 0:

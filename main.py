@@ -109,7 +109,7 @@ async def start():
             #     'gpio_program.py',
             #     stdout=asyncio.subprocess.PIPE,
             #     stderr=asyncio.subprocess.PIPE,
-            # )
+            # ) 
             #stdout, stderr = await process.communicate()
             #risultato = stdout.decode().strip()
             await asyncio.sleep(15)
