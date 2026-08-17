@@ -4,7 +4,7 @@ from loggingConfig import logClient
 import asyncio
 import threading
 
-timeout = 6
+timeout = 10
 
 class Client():
     def __init__(self, token, position):
@@ -21,7 +21,7 @@ class Client():
     def isLogged(self):
         return (datetime.now() - self.last_seen).seconds < timeout
     def update_activity(self):
-        logClient(self, "sono ancora connesso")
+        logClient(self, "ping")
         self.last_seen = datetime.now()
 
 class Clients:
@@ -33,7 +33,7 @@ class Clients:
         c = Client(token, len(self.clients))
         with self.lock:
             self.clients.append(c)
-            logClient(c, "aggiunto in coda")
+            logClient(c, "login")
         return c
 
     def isFirst(self, client):
@@ -51,7 +51,7 @@ class Clients:
         logClient(c, msg)
         for position, client in enumerate(self.clients, index):
             client.position = position
-            logClient(client, f"Nuova posizione: {position}")
+            logClient(client, f"update position to {position}")
         return c
 
     def __startNext(self):
@@ -63,11 +63,11 @@ class Clients:
             if len(self.clients) > 0:
                 for i in range(len(self.clients) - 1, -1, -1):
                     if not self.clients[i].isLogged():
-                        self.__remove("rimosso per intattività", i)
+                        self.__remove("removed", i)
                         if i == 0:
                             self.__startNext()
 
     def logout(self):
         with self.lock:
-            self.__remove("si è sloggato")
+            self.__remove("logout")
             self.__startNext()

@@ -1,8 +1,5 @@
-import os
 import logging
 from logging.handlers import RotatingFileHandler
-
-os.makedirs('logs', exist_ok=True)
 
 logger = logging.getLogger('sbronzolo')
 logger.setLevel(logging.INFO)
