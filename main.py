@@ -65,10 +65,17 @@ async def start():
                 await shaking()
             case State.READY_TO_DRINK:
                 readyToDrink()
+    def switchTo(next):
+        try:
+            if not client or not client.isLogged():
+                return
+            app.storage.user['state'] = next
+            switch.refresh()
+        except (RuntimeError, KeyError, AssertionError):
+            pass
     def queue():
         if clients.isFirst(client):
-            app.storage.user['state'] = State.COCKTAIL
-            switch.refresh()
+            switchTo(State.COCKTAIL)
             return
         with ui.column().classes('w-full items-center'):
             ui.label('Sbronzolo').classes('text-5xl')
@@ -80,16 +87,15 @@ async def start():
             ).classes('text-lg')
             async def wait_for_turn():
                 await client.event.wait()
-                app.storage.user['state'] = State.COCKTAIL
-                switch.refresh()
-            asyncio.create_task(wait_for_turn())
+                switchTo(State.COCKTAIL)
+            task = asyncio.create_task(wait_for_turn())
+            ui.context.client.on_disconnect(task.cancel)
     def cocktail():
         with open('cocktails.json', 'r', encoding='utf-8') as f:
             data = json.load(f)
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c['nome']
-            app.storage.user['state'] = State.SHAKING
-            switch.refresh()
+            switchTo(State.SHAKING)
         with ui.column().classes('w-full items-center'):
             ui.label('Sbronzolo').classes('text-5xl')
             ui.label('Seleziona il cocktail:').classes('text-lg')
@@ -112,10 +118,12 @@ async def start():
             # ) 
             #stdout, stderr = await process.communicate()
             #risultato = stdout.decode().strip()
-            await asyncio.sleep(15)
-            spinner.visible = False
-            app.storage.user['state'] = State.READY_TO_DRINK
-            switch.refresh()
+            try:
+                await asyncio.sleep(15)
+                spinner.visible = False
+                switchTo(State.READY_TO_DRINK)
+            except asyncio.CancelledError:
+                pass
     def readyToDrink():
         with ui.column().classes('w-full items-center'):
             ui.label('Sbronzolo').classes('text-5xl')
