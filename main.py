@@ -101,7 +101,7 @@ async def home():
             app.storage.user['cocktail'] = c['nome']
             switchTo(State.SHAKING)
         with layout():
-            ui.label('Seleziona il cocktail:').classes('text-xl')
+            ui.label('E il tuo turno\nSeleziona il cocktail').classes('text-xl text-center whitespace-pre-line')
             for c in data:
                 ui.button(
                     c['nome'], 
