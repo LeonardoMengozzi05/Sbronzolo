@@ -15,6 +15,7 @@ class State(Enum):
     SHAKING = auto()
     COMPLEATE = auto()
     READY_TO_DRINK = auto()
+    BYE = auto()
 
 clients = Clients()
 
@@ -71,6 +72,8 @@ async def home():
                 compleate()
             case State.READY_TO_DRINK:
                 readyToDrink()
+            case State.BYE:
+                bye()
     def switchTo(next):
         try:
             if not client or not client.isLogged():
@@ -101,6 +104,7 @@ async def home():
             task = asyncio.create_task(wait_for_turn())
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
+        # TODO: fare che vengono mostrati solo cocktail disponibili.
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c
             switchTo(State.SHAKING)
@@ -130,7 +134,7 @@ async def home():
         if not len(toppings):
             switchTo(State.READY_TO_DRINK)
         with layout():
-            ui.label(f'Il to {c['nome']}\nè guasi pronto!\nAggiungi:').classes('text-xl text-center whitespace-pre-line')
+            ui.label(f'Il to {c['nome']}\nè guasi pronto! Aggiungi:').classes('text-xl text-center whitespace-pre-line')
             for topping in toppings:
                 ui.label(topping).classes('text-xl')
             ui.button('Fatto', on_click=lambda: switchTo(State.READY_TO_DRINK)).classes('text-lg bg-black')
@@ -141,9 +145,12 @@ async def home():
                 heartbeat.cancel()
                 app.storage.user.pop('token', None)
                 clients.logout()
-                ui.run_javascript('window.close();')
-            ui.button('Ritira e Esci', on_click=ritirato).classes('text-lg bg-black')
-
+                switchTo(State.BYE)
+            ui.button('Ritira', on_click=ritirato).classes('text-lg bg-black')
+    def bye():
+        with layout():
+            ui.image('/img/byebye.jpeg').classes('w-4/5')
+            ui.label('Puoi chiudere questa pagina\nArrivederci!').classes('text-xl text-center whitespace-pre-line')
     switch()
 
 ui.run(
