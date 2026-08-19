@@ -21,6 +21,10 @@
       {
         "nome": "Soda",
         "quantita": 60
+      },
+      {
+        "nome": "Ghiaccio",
+        "quantita": "full"
       }
     ]
   },

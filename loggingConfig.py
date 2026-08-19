@@ -1,9 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-with open("./logs/sbronzolo.log", "a", encoding="utf-8") as f:
-    f.write("--- NEW SESSION ---\n")
-
 logger = logging.getLogger('sbronzolo')
 logger.setLevel(logging.INFO)
 

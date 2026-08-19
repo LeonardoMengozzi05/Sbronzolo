@@ -13,8 +13,8 @@ class State(Enum):
     CODA = auto()
     COCKTAIL = auto()
     SHAKING = auto()
+    COMPLEATE = auto()
     READY_TO_DRINK = auto()
-    BYE = auto()
 
 clients = Clients()
 
@@ -67,6 +67,8 @@ async def home():
                 cocktail()
             case State.SHAKING:
                 shaking()
+            case State.COMPLEATE:
+                compleate()
             case State.READY_TO_DRINK:
                 readyToDrink()
     def switchTo(next):
@@ -100,7 +102,7 @@ async def home():
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
         def seleziona_cocktail(c):
-            app.storage.user['cocktail'] = c['nome']
+            app.storage.user['cocktail'] = c
             switchTo(State.SHAKING)
         with layout():
             ui.label('E il tuo turno\nSeleziona il cocktail').classes('text-xl text-center whitespace-pre-line')
@@ -110,18 +112,28 @@ async def home():
                     on_click=lambda c=c: seleziona_cocktail(c)
                 ).classes('w-3/5 text-lg bg-black')
     def shaking():
-        c = app.storage.user.get('cocktail')
+        c = app.storage.user.get('cocktail', {})
         with layout():
-            ui.label(f'Il tuo {c}\nè in preparazione').classes('text-xl text-center whitespace-pre-line')
+            ui.label(f'Il tuo {c['nome']}\nè in preparazione!').classes('text-xl text-center whitespace-pre-line')
             spinner = ui.spinner(size='lg', color='black')
             async def prepare():
                 try:
-                    await asyncio.sleep(15)
-                    switchTo(State.READY_TO_DRINK)
+                    await asyncio.sleep(3)
+                    switchTo(State.COMPLEATE)
                 except asyncio.CancelledError:
                     pass
             task = asyncio.create_task(prepare())
             ui.context.client.on_disconnect(task.cancel)
+    def compleate():
+        c = app.storage.user.get('cocktail', {})
+        toppings = [ing["nome"] for ing in c["ingredienti"] if ing["quantita"] == 'full']
+        if not len(toppings):
+            switchTo(State.READY_TO_DRINK)
+        with layout():
+            ui.label(f'Il to {c['nome']}\nè guasi pronto!\nAggiungi:').classes('text-xl text-center whitespace-pre-line')
+            for topping in toppings:
+                ui.label(topping).classes('text-xl')
+            ui.button('Fatto', on_click=lambda: switchTo(State.READY_TO_DRINK)).classes('text-lg bg-black')
     def readyToDrink():
         with layout():
             ui.label('Il tuo cocktail è pronto!').classes('text-xl')
