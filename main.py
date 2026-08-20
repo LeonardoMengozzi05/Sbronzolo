@@ -1,5 +1,6 @@
-from nicegui import app, ui
+from multiprocessing.connection import Client
 from contextlib import contextmanager
+from nicegui import app, ui
 from clients import Clients
 from enum import Enum, auto
 import uuid
@@ -19,19 +20,13 @@ class State(Enum):
 
 clients = Clients()
 
-try:
-    with open('cocktails.json', 'r', encoding='utf-8') as f:
-        COCKTAILS_DATA = json.load(f)
-except Exception:
-    COCKTAILS_DATA = []
-
 async def bouncer_task():
     while True:
         try:
             clients.removeSlogged()
         except Exception as e:
             print(f"Errore bouncer: {e}")
-        await asyncio.sleep(5)
+        await asyncio.sleep(3)
 app.on_startup(lambda: asyncio.create_task(bouncer_task()))
 
 @ui.page('/')
@@ -104,27 +99,38 @@ async def home():
             task = asyncio.create_task(wait_for_turn())
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
-        # TODO: fare che vengono mostrati solo cocktail disponibili.
+        with open('cocktails.json', 'r', encoding='utf-8') as file:
+            COCKTAILS_DATA = json.load(file)
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c
             switchTo(State.SHAKING)
         with layout():
             ui.label('E il tuo turno\nSeleziona il cocktail').classes('text-xl text-center whitespace-pre-line')
             for c in COCKTAILS_DATA:
-                ui.button(
-                    c['nome'], 
-                    on_click=lambda c=c: seleziona_cocktail(c)
-                ).classes('w-3/5 text-lg bg-black')
+                if c['disponibile']:
+                    ui.button(
+                        c['nome'], 
+                        on_click=lambda c=c: seleziona_cocktail(c)
+                    ).classes('w-3/5 text-lg bg-black')
     def shaking():
         c = app.storage.user.get('cocktail', {})
         with layout():
             ui.label(f'Il tuo {c['nome']}\nè in preparazione!').classes('text-xl text-center whitespace-pre-line')
             spinner = ui.spinner(size='lg', color='black')
             async def prepare():
+                SERVER_ADDRESS = ('127.0.0.1', 6000)
+                AUTH_KEY = b'''
+                    Beh, Shinji, io non posso fare altro che stare qui ad annaffiare. Pero', 
+                    quanto a te, quanto a quel che non puoi far che tu, per te qualcosa da 
+                    poter far dovrebbe esserci. Ma non ti costringera' nessuno, pensa da te 
+                    stesso, decidi da te stesso che cosa tu stesso possa fare. Beh, che tu 
+                    non abbia rammarichi.
+                '''
                 try:
-                    await asyncio.sleep(3)
-                    switchTo(State.COMPLEATE)
-                except asyncio.CancelledError:
+                    with Client(SERVER_ADDRESS, family='AF_INET', authkey=AUTH_KEY) as conn:
+                        conn.send({"cocktail": c})
+                        return conn.recv()
+                except Exception as e:
                     pass
             task = asyncio.create_task(prepare())
             ui.context.client.on_disconnect(task.cancel)

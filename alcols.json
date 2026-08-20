@@ -1,0 +1,8 @@
+[
+    {
+        "nome": "Gin",
+        "pompa": 1,
+        "bottone": 2,
+        "led": 3
+    }
+]

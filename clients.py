@@ -4,7 +4,7 @@ from loggingConfig import logClient
 import asyncio
 import threading
 
-timeout = 10
+timeout = 6
 
 class Client():
     def __init__(self, token, position):
