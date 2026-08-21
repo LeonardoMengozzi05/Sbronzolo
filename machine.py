@@ -6,7 +6,7 @@ import time
 COCKTAIL_FILE = 'cocktails.json'
 ALCOLS_FILE = 'alcols.json'
 MAX = 2000
-MIN = 200
+MIN = 50
 
 class Alcol():
     def __setCocktail(self, disponibility):

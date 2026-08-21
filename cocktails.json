@@ -27,7 +27,7 @@
         "quantita": "full"
       }
     ],
-    "disponibile": "True"
+    "disponibile": true
   },
   {
     "nome": "Negroni",
@@ -45,7 +45,7 @@
         "quantita": 30
       }
     ],
-    "disponibile": "True"
+    "disponibile": true
   },
   {
     "nome": "Margarita",
@@ -63,6 +63,6 @@
         "quantita": 15
       }
     ],
-    "disponibile": "True"
+    "disponibile": false
   }
 ]
