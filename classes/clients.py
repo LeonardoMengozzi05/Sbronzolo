@@ -1,6 +1,6 @@
 from nicegui.observables import ObservableDict
 from datetime import datetime 
-from loggingConfig import logClient
+from classes.loggingConfig import logClient
 import asyncio
 import threading
 

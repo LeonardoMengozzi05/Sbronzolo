@@ -1,7 +1,7 @@
 from multiprocessing.connection import Client
 from contextlib import contextmanager
 from nicegui import app, ui
-from clients import Clients
+from classes.clients import Clients
 from enum import Enum, auto
 import uuid
 import asyncio
