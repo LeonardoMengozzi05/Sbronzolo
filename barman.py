@@ -20,7 +20,7 @@ def loop():
         conn.send({"status": "finito"})
         conn.close()
 
-print("Barman in ascolto!!!")
+print("Barman ready")
 try:
     listener = Listener(('0.0.0.0', 6000))
     alcols = Alcols()
