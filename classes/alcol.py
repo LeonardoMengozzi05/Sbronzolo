@@ -7,18 +7,22 @@ import os
 mock = os.getenv("DEBUG") == "true"
 COCKTAIL_FILE = 'jsons/cocktails.json'
 ALCOLS_FILE = 'jsons/alcols.json'
-MAX = 2000
+MAX = 1000
 MIN = 50
 
 class Alcol():
     def __setCocktail(self, disponibility):
         with open(COCKTAIL_FILE, "r", encoding="utf-8") as file:
-            data = json.load(file)
-        for cocktail in data:
-            if any(ing["nome"] == self.alcol for ing in cocktail["ingredienti"]):
-                cocktail['disponibilita'] = disponibility
+            cocktails = json.load(file)
+        for cocktail in cocktails:
+            ing = next(
+                (ing for ing in cocktail["ingredienti"] if ing['nome'] == self.alcol),
+                None
+            )
+            if ing:
+                ing['disponibilita'] = disponibility
         with open(COCKTAIL_FILE, "w", encoding="utf-8") as file:
-            json.dump(data, file, indent=4)
+            json.dump(cocktails, file, indent=4)
 
     def __resetAmount(self):
         self.led.off()
