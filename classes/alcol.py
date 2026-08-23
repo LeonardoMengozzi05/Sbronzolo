@@ -1,9 +1,13 @@
 from gpiozero import OutputDevice, Button, LED
+from classes.loggingConfig import logAlcol
+import os 
 import json
 import time
 
-COCKTAIL_FILE = 'cocktails.json'
-ALCOLS_FILE = 'alcols.json'
+os.environ['GPIOZERO_PIN_FACTORY'] = 'mock'
+
+COCKTAIL_FILE = 'jsons/cocktails.json'
+ALCOLS_FILE = 'jsons/alcols.json'
 MAX = 2000
 MIN = 50
 
@@ -28,7 +32,7 @@ class Alcol():
             self.__setCocktail(False)
 
     def __init__(self, alcol):
-        self.alcol = alcol['alcol']
+        self.alcol = alcol['nome']
         self.pompa = OutputDevice(
             alcol['pompa'], 
             active_high=True, 
@@ -40,18 +44,21 @@ class Alcol():
         self.amount = MAX
 
     def dispense(self, ml):
-        self.pompa.on()
-        t = ml# TODO: formula che converte i ml della ricetta in un tempo congruo alla capacità della pompa
-        time.sleep(t)
-        self.pompa.off()
-        self.amount -= ml
-        self.__checkAmount()
+        logAlcol(f"dispensed {ml}ml of {self.alcol}")
+        if os.getenv("DEBUG") == "false": 
+            self.pompa.on()
+            # TODO: formula che converte i ml della ricetta in un tempo congruo alla capacità della pompa
+            t = ml
+            time.sleep(t)
+            self.pompa.off()
+            self.amount -= ml
+            self.__checkAmount()
 
 class Alcols():
     def __init__(self):
         with open(ALCOLS_FILE, 'r', encoding='utf-8') as file:
             ALCOLS_DATA = json.load(file)
-        self.alcols = [Alcol(alcol) for alcol in ALCOLS_FILE]
+        self.alcols = [Alcol(alcol) for alcol in ALCOLS_DATA]
 
     def getAlcolByName(self, alcolName):
         return next((a for a in self.alcols if a.alcol == alcolName), None)

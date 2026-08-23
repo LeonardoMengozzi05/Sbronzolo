@@ -1,5 +1,5 @@
-import logging
 from logging.handlers import RotatingFileHandler
+import logging
 
 logger = logging.getLogger('sbronzolo')
 logger.setLevel(logging.INFO)
@@ -10,6 +10,9 @@ def logClient(client, message):
         client.token[:8],
         message
     )
+
+def logAlcol(message):
+    logger.info(message)
 
 handler = RotatingFileHandler(
     'logs/sbronzolo.log',

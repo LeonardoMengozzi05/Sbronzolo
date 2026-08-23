@@ -1,7 +1,9 @@
 from multiprocessing.connection import Listener
+import multiprocessing
 from classes.alcol import Alcols
 import time
 
+multiprocessing.current_process().authkey = b'SbronZolo67!'
 
 def mixing(cocktail):
     for ing in cocktail["ingredienti"]:
@@ -13,19 +15,14 @@ def mixing(cocktail):
 def loop():
     while True:
         conn = listener.accept()
-        mixing(conn.recv().get('cocktail'))
+        cocktail = conn.recv().get('cocktail')
+        mixing(cocktail)
+        conn.send({"status": "finito"})
         conn.close()
 
+print("Barman in ascolto!!!")
 try:
-    ADDRESS = ('0.0.0.0', 6000)
-    AUTH_KEY = b'''
-        Beh, Shinji, io non posso fare altro che stare qui ad annaffiare. Pero', 
-        quanto a te, quanto a quel che non puoi far che tu, per te qualcosa da 
-        poter far dovrebbe esserci. Ma non ti costringera' nessuno, pensa da te 
-        stesso, decidi da te stesso che cosa tu stesso possa fare. Beh, che tu 
-        non abbia rammarichi.
-    '''
-    listener = Listener(ADDRESS, family='AF_INET', authkey=AUTH_KEY)
+    listener = Listener(('0.0.0.0', 6000))
     alcols = Alcols()
     loop()
 finally:

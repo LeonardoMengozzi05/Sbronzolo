@@ -3,12 +3,15 @@ from contextlib import contextmanager
 from nicegui import app, ui
 from classes.clients import Clients
 from enum import Enum, auto
+import multiprocessing
 import uuid
 import asyncio
 import json
 
 app.add_static_files('/font', 'font')
 app.add_static_files('/img', 'img')
+
+multiprocessing.current_process().authkey = b'SbronZolo67!'
 
 class State(Enum):
     CODA = auto()
@@ -99,7 +102,7 @@ async def home():
             task = asyncio.create_task(wait_for_turn())
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
-        with open('cocktails.json', 'r', encoding='utf-8') as file:
+        with open('jsons/cocktails.json', 'r', encoding='utf-8') as file:
             COCKTAILS_DATA = json.load(file)
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c
@@ -118,18 +121,11 @@ async def home():
             ui.label(f'Il tuo {c['nome']}\nè in preparazione!').classes('text-xl text-center whitespace-pre-line')
             spinner = ui.spinner(size='lg', color='black')
             async def prepare():
-                SERVER_ADDRESS = ('127.0.0.1', 6000)
-                AUTH_KEY = b'''
-                    Beh, Shinji, io non posso fare altro che stare qui ad annaffiare. Pero', 
-                    quanto a te, quanto a quel che non puoi far che tu, per te qualcosa da 
-                    poter far dovrebbe esserci. Ma non ti costringera' nessuno, pensa da te 
-                    stesso, decidi da te stesso che cosa tu stesso possa fare. Beh, che tu 
-                    non abbia rammarichi.
-                '''
                 try:
-                    with Client(SERVER_ADDRESS, family='AF_INET', authkey=AUTH_KEY) as conn:
+                    with Client(('localhost', 6000)) as conn:
                         conn.send({"cocktail": c})
-                        return conn.recv()
+                        conn.recv()
+                        switchTo(State.COMPLEATE)
                 except Exception as e:
                     pass
             task = asyncio.create_task(prepare())
