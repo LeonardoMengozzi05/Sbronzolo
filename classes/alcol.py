@@ -50,8 +50,7 @@ class Alcol():
         logAlcol(f"dispensed {ml}ml of {self.alcol}")
         if not mock: 
             self.pompa.on()
-            # TODO: formula che converte i ml della ricetta in un tempo congruo alla capacità della pompa
-            t = ml
+            t = ml / 90 * 60
             time.sleep(t)
             self.pompa.off()
             self.amount -= ml
