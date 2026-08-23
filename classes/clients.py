@@ -1,8 +1,8 @@
 from nicegui.observables import ObservableDict
 from datetime import datetime 
 from classes.loggingConfig import logClient
-import asyncio
 import threading
+import asyncio
 
 timeout = 6
 

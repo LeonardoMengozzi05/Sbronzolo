@@ -1,11 +1,10 @@
 from gpiozero import OutputDevice, Button, LED
 from classes.loggingConfig import logAlcol
-import os 
 import json
 import time
+import os 
 
-os.environ['GPIOZERO_PIN_FACTORY'] = 'mock'
-
+mock = os.getenv("DEBUG") == "true"
 COCKTAIL_FILE = 'jsons/cocktails.json'
 ALCOLS_FILE = 'jsons/alcols.json'
 MAX = 2000
@@ -45,7 +44,7 @@ class Alcol():
 
     def dispense(self, ml):
         logAlcol(f"dispensed {ml}ml of {self.alcol}")
-        if os.getenv("DEBUG") == "false": 
+        if not mock: 
             self.pompa.on()
             # TODO: formula che converte i ml della ricetta in un tempo congruo alla capacità della pompa
             t = ml

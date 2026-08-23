@@ -3,7 +3,6 @@ from classes.alcol import Alcols
 import multiprocessing
 import signal
 import time
-import sys
 
 def mixing(cocktail):
     for ing in cocktail["ingredienti"]:
