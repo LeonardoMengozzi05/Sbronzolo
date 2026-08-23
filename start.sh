@@ -11,7 +11,8 @@ python3 app.py &
 APP_PID=$!
 
 cleanup() {
-    echo "Arresto Sbronzolo..."
+    trap - SIGINT SIGTERM EXIT
+    echo -e "\nArresto Sbronzolo..."
     kill $BARMAN_PID $APP_PID 2>/dev/null
     wait $BARMAN_PID $APP_PID 2>/dev/null
 }

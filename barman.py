@@ -1,9 +1,9 @@
 from multiprocessing.connection import Listener
-import multiprocessing
 from classes.alcol import Alcols
+import multiprocessing
+import signal
 import time
-
-multiprocessing.current_process().authkey = b'SbronZolo67!'
+import sys
 
 def mixing(cocktail):
     for ing in cocktail["ingredienti"]:
@@ -14,16 +14,35 @@ def mixing(cocktail):
 
 def loop():
     while True:
-        conn = listener.accept()
-        cocktail = conn.recv().get('cocktail')
-        mixing(cocktail)
-        conn.send({"status": "finito"})
-        conn.close()
+        try:
+            conn = listener.accept()
+            cocktail = conn.recv().get('cocktail')
+            mixing(cocktail)
+            conn.send({"status": "finito"})
+            conn.close()
+        except (OSError, EOFError):
+            break
+
+def handleClosing(signum, frame):
+    if alcols and hasattr(alcols, 'stopAll'):
+        alcols.stopAll()
+    if listener:
+        try:
+            listener.close()
+        except Exception:
+            pass
+
+# Intercetta sia Ctrl+C (SIGINT) che il comando kill standard (SIGTERM)
+signal.signal(signal.SIGINT, handleClosing)
+signal.signal(signal.SIGTERM, handleClosing)
 
 print("Barman ready")
+multiprocessing.current_process().authkey = b'SbronZolo67!'
+listener = Listener(('0.0.0.0', 6000))
+alcols = Alcols()
+
 try:
-    listener = Listener(('0.0.0.0', 6000))
-    alcols = Alcols()
     loop()
 finally:
-    listener.close()
+    if listener:
+        listener.close()

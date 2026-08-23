@@ -8,11 +8,6 @@ import uuid
 import asyncio
 import json
 
-app.add_static_files('/font', 'font')
-app.add_static_files('/img', 'img')
-
-multiprocessing.current_process().authkey = b'SbronZolo67!'
-
 class State(Enum):
     CODA = auto()
     COCKTAIL = auto()
@@ -21,16 +16,39 @@ class State(Enum):
     READY_TO_DRINK = auto()
     BYE = auto()
 
+multiprocessing.current_process().authkey = b'SbronZolo67!'
+ADDRESS = ('localhost', 6000)
 clients = Clients()
+bouncer = None
 
 async def bouncer_task():
-    while True:
-        try:
-            clients.removeSlogged()
-        except Exception as e:
-            print(f"Errore bouncer: {e}")
-        await asyncio.sleep(3)
-app.on_startup(lambda: asyncio.create_task(bouncer_task()))
+    try:
+        while True:
+            try:
+                clients.removeSlogged()
+            except Exception as e:
+                print(f"Errore bouncer: {e}")
+            await asyncio.sleep(3)
+    except asyncio.CancelledError:
+        pass
+
+def start_bouncer():
+    global bouncer_job
+    bouncer_job = asyncio.create_task(bouncer_task())
+
+def stop_bouncer():
+    if bouncer_job:
+        bouncer_job.cancel()
+
+app.on_startup(start_bouncer)
+app.on_shutdown(stop_bouncer)
+app.add_static_files('/img', 'img')
+app.add_static_files('/font', 'font')
+
+def sendToBarman(cocktail):
+    with Client(ADDRESS) as conn:
+        conn.send({"cocktail": cocktail})
+        return conn.recv()
 
 @ui.page('/')
 async def home():
@@ -122,10 +140,8 @@ async def home():
             spinner = ui.spinner(size='lg', color='black')
             async def prepare():
                 try:
-                    with Client(('localhost', 6000)) as conn:
-                        conn.send({"cocktail": c})
-                        conn.recv()
-                        switchTo(State.COMPLEATE)
+                    await asyncio.to_thread(sendToBarman, c)
+                    switchTo(State.COMPLEATE)
                 except Exception as e:
                     pass
             task = asyncio.create_task(prepare())
@@ -160,5 +176,6 @@ ui.run(
     port=8080, 
     storage_secret='Sbronzolo',
     title='Sbronzolo',
-    favicon='🍸'
+    favicon='🍸',
+    show=False
 )

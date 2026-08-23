@@ -62,3 +62,7 @@ class Alcols():
 
     def getAlcolByName(self, alcolName):
         return next((a for a in self.alcols if a.alcol == alcolName), None)
+
+    def stopAll(self):
+        for alcol in self.alcols: 
+            alcol.pompa.off()
