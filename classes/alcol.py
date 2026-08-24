@@ -4,7 +4,6 @@ import json
 import time
 import os 
 
-mock = os.getenv("DEBUG") == "true"
 COCKTAIL_FILE = 'jsons/cocktails.json'
 ALCOLS_FILE = 'jsons/alcols.json'
 MAX = 1000
@@ -25,9 +24,10 @@ class Alcol():
             json.dump(cocktails, file, indent=4)
 
     def __resetAmount(self):
-        self.led.off()
-        self.amount = MAX
-        self.__setCocktail(True)
+        if self.led.is_active:
+            self.led.off()
+            self.amount = MAX
+            self.__setCocktail(True)
 
     def __checkAmount(self):
         if self.amount < MIN:
@@ -48,7 +48,7 @@ class Alcol():
 
     def dispense(self, ml):
         logAlcol(f"dispensed {ml}ml of {self.alcol}")
-        if not mock: 
+        if os.getenv("DEBUG") == "false": 
             self.pompa.on()
             t = ml / 90 * 60
             time.sleep(t)
