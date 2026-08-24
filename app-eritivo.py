@@ -8,15 +8,6 @@ import uuid
 import asyncio
 import json
 
-# Risposta per Android (Google Connectivity Check)
-@app.get('/generate_204')
-def android_check():
-    return '', 204
-# Risposta per iOS (Apple Captive Portal Check)
-@app.get('/hotspot-detect.html')
-def apple_check():
-    return '<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>', 200
-
 class State(Enum):
     CODA = auto()
     COCKTAIL = auto()
