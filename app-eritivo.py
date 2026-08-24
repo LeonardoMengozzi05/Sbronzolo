@@ -182,7 +182,7 @@ async def home():
 
 ui.run(
     host='0.0.0.0', 
-    port=80, 
+    port=8080, 
     storage_secret='Sbronzolo',
     title='Sbronzolo',
     favicon='🍸',
