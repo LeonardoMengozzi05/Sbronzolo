@@ -1,68 +1,70 @@
 [
-  {
-    "nome": "Mojito",
-    "ingredienti": [
-      {
-        "nome": "Rum Bianco",
-        "quantita": 50
-      },
-      {
-        "nome": "Succo di Lime",
-        "quantita": 30
-      },
-      {
-        "nome": "Menta",
-        "quantita": 6
-      },
-      {
-        "nome": "Zucchero di Canna",
-        "quantita": 2
-      },
-      {
-        "nome": "Soda",
-        "quantita": 60
-      },
-      {
-        "nome": "Ghiaccio",
-        "quantita": "full"
-      }
-    ],
-    "disponibile": true
-  },
-  {
-    "nome": "Negroni",
-    "ingredienti": [
-      {
-        "nome": "Gin",
-        "quantita": 30
-      },
-      {
-        "nome": "Campari",
-        "quantita": 30
-      },
-      {
-        "nome": "Vermouth Rosso",
-        "quantita": 30
-      }
-    ],
-    "disponibile": true
-  },
-  {
-    "nome": "Margarita",
-    "ingredienti": [
-      {
-        "nome": "Tequila",
-        "quantita": 50
-      },
-      {
-        "nome": "Triple Sec",
-        "quantita": 20
-      },
-      {
-        "nome": "Succo di Lime",
-        "quantita": 15
-      }
-    ],
-    "disponibile": false
-  }
+    {
+        "nome": "Mojito",
+        "ingredienti": [
+            {
+                "nome": "Rum Bianco",
+                "quantita": 50
+            },
+            {
+                "nome": "Succo di Lime",
+                "quantita": 30
+            },
+            {
+                "nome": "Menta",
+                "quantita": 6
+            },
+            {
+                "nome": "Zucchero di Canna",
+                "quantita": 2
+            },
+            {
+                "nome": "Soda",
+                "quantita": 60
+            },
+            {
+                "nome": "Ghiaccio",
+                "quantita": "full"
+            }
+        ],
+        "disponibile": true
+    },
+    {
+        "nome": "Negroni",
+        "ingredienti": [
+            {
+                "nome": "Gin",
+                "quantita": 30,
+                "disponibilita": false,
+                "disponibile": false
+            },
+            {
+                "nome": "Campari",
+                "quantita": 30
+            },
+            {
+                "nome": "Vermouth Rosso",
+                "quantita": 30
+            }
+        ],
+        "disponibile": true
+    },
+    {
+        "nome": "Margarita",
+        "ingredienti": [
+            {
+                "nome": "Tequila",
+                "quantita": 50
+            },
+            {
+                "nome": "Triple Sec",
+                "quantita": 20
+            },
+            {
+                "nome": "Succo di Lime",
+                "quantita": 15
+            }
+        ],
+        "disponibile": false
+    }
 ]

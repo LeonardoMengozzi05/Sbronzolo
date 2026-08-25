@@ -31,7 +31,6 @@ def handleClosing(signum, frame):
         except Exception:
             pass
 
-# Intercetta sia Ctrl+C (SIGINT) che il comando kill standard (SIGTERM)
 signal.signal(signal.SIGINT, handleClosing)
 signal.signal(signal.SIGTERM, handleClosing)
 

@@ -1,5 +1,7 @@
 from gpiozero import OutputDevice, Button, LED
+from gpiozero.pins.mock import MockFactory
 from classes.loggingConfig import logAlcol
+import gpiozero
 import json
 import time
 import os 
@@ -19,7 +21,7 @@ class Alcol():
                 None
             )
             if ing:
-                ing['disponibilita'] = disponibility
+                cocktail['disponibile'] = disponibility
         with open(COCKTAIL_FILE, "w", encoding="utf-8") as file:
             json.dump(cocktails, file, indent=4)
 
@@ -68,3 +70,22 @@ class Alcols():
     def stopAll(self):
         for alcol in self.alcols: 
             alcol.pompa.off()
+
+if __name__ == "__main__":
+    os.environ['DEBUG'] = "false"
+    MAX = 60
+    gpiozero.Device.pin_factory = MockFactory()
+    controller = Alcol({
+        "nome": "Gin",
+        "pompa": 1,
+        "bottone": 2,
+        "led": 3
+    })
+    controller.dispense(11)
+    assert controller.led.is_active, "Errore: Il LED dovrebbe essere accesso dopo il superamento della soglia minimina."
+    with open(COCKTAIL_FILE, "r", encoding="utf-8") as file:
+        print(json.load(file))
+    assert controller.button.pin is not None
+    controller.button.pin.drive_low()
+    assert not controller.led.is_active and controller.amount == MAX, "Errore il LED dovrebbe essere spento dopo la pressione del bottone."
+    print("Tutti i test ✓...")
