@@ -1,5 +1,6 @@
 #!/bin/bash
 source .venv/bin/activate
+cd "$(dirname "$0")/.."
 if [[ "$1" == "-mock" ]]; then
     echo "Avvio in modalita' mock"
     DEBUG="true" GPIOZERO_PIN_FACTORY="mock" python3 barman.py &

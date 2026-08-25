@@ -6,8 +6,8 @@ import json
 import time
 import os 
 
-COCKTAIL_FILE = 'jsons/cocktails.json'
-ALCOLS_FILE = 'jsons/alcols.json'
+COCKTAIL_FILE = 'data/jsons/cocktails.json'
+ALCOLS_FILE = 'data/jsons/alcols.json'
 MAX = 1000
 MIN = 50
 

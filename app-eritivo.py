@@ -42,8 +42,8 @@ def stop_bouncer():
 
 app.on_startup(start_bouncer)
 app.on_shutdown(stop_bouncer)
-app.add_static_files('/img', 'img')
-app.add_static_files('/font', 'font')
+app.add_static_files('/img', 'data/img')
+app.add_static_files('/font', 'data/font')
 
 def sendToBarman(cocktail):
     with Client(ADDRESS) as conn:
@@ -120,7 +120,7 @@ async def home():
             task = asyncio.create_task(wait_for_turn())
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
-        with open('jsons/cocktails.json', 'r', encoding='utf-8') as file:
+        with open('../data/jsons/cocktails.json', 'r', encoding='utf-8') as file:
             COCKTAILS_DATA = json.load(file)
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c

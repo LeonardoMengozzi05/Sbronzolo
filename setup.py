@@ -2,7 +2,7 @@ from gpiozero import OutputDevice, Button
 import json
 from signal import pause
 
-with open('jsons/alcols.json', "r", encoding="utf-8") as file:
+with open('../data/jsons/alcols.json', "r", encoding="utf-8") as file:
     alcos = json.load(file)
 
 dispositivi = []
