@@ -120,7 +120,7 @@ async def home():
             task = asyncio.create_task(wait_for_turn())
             ui.context.client.on_disconnect(task.cancel)
     def cocktail():
-        with open('../data/jsons/cocktails.json', 'r', encoding='utf-8') as file:
+        with open('data/jsons/cocktails.json', 'r', encoding='utf-8') as file:
             COCKTAILS_DATA = json.load(file)
         def seleziona_cocktail(c):
             app.storage.user['cocktail'] = c
